@@ -258,3 +258,24 @@ class FeatureGatingServicesTest(test_utils.GenericTestBase):
                     }
                 ]
             )
+
+    def test_update_dev_feature_flag_rules_enabling_in_test_env_raises_error(
+            self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Feature in dev stage cannot be enabled in test or production'
+            ' environment.'):
+            feature_services.update_feature_flag_rules(
+                self.dev_feature.name, self.user_id, 'test update',
+                [
+                    {
+                        'filters': [
+                            {
+                                'type': 'server_mode',
+                                'conditions': [['=', 'dev'], ['=', 'test']]
+                            }
+                        ],
+                        'value_when_matched': True
+                    },
+                ]
+            )
